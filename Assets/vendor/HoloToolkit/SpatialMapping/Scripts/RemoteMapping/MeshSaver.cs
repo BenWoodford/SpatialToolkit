@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-#if !UNITY_EDITOR && UNITY_WSA
+#if !UNITY_EDITOR && UNITY_METRO
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -31,7 +31,7 @@ namespace HoloToolkit.Unity.SpatialMapping
         {
             get
             {
-#if !UNITY_EDITOR && UNITY_WSA
+#if !UNITY_EDITOR && UNITY_METRO
                 return ApplicationData.Current.RoamingFolder.Path;
 #else
                 return Application.persistentDataPath;

@@ -2,13 +2,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-#if UNITY_WSA || UNITY_STANDALONE_WIN
+using UnityEngine.EventSystems;
 using UnityEngine.Windows.Speech;
-#endif
+using UnityEngine.XR.WSA.Input;
 
 namespace HoloToolkit.Unity.InputModule
 {
@@ -24,7 +21,7 @@ namespace HoloToolkit.Unity.InputModule
     /// </summary>
     public partial class SpeechInputSource : BaseInputSource
     {
-        [Serializable]
+        [System.Serializable]
         public struct KeywordAndKeyCode
         {
             [Tooltip("The keyword to recognize.")]
@@ -32,12 +29,6 @@ namespace HoloToolkit.Unity.InputModule
             [Tooltip("The KeyCode to recognize.")]
             public KeyCode KeyCode;
         }
-
-        /// <summary>
-        /// Keywords are persistent across all scenes.  This Speech Input Source instance will not be destroyed when loading a new scene.
-        /// </summary>
-        [Tooltip("Keywords are persistent across all scenes.  This Speech Input Source instance will not be destroyed when loading a new scene.")]
-        public bool PersistentKeywords;
 
         // This enumeration gives the manager two different ways to handle the recognizer. Both will
         // set up the recognizer and add all keywords. The first causes the recognizer to start
@@ -50,40 +41,30 @@ namespace HoloToolkit.Unity.InputModule
         [Tooltip("The keywords to be recognized and optional keyboard shortcuts.")]
         public KeywordAndKeyCode[] Keywords;
 
-#if UNITY_WSA || UNITY_STANDALONE_WIN
-        [Tooltip("The confidence level for the keyword recognizer.")]
-        //The serialized data of this field will be lost when switching between platforms and re-serializing this class.
-        public ConfidenceLevel RecognitionConfidenceLevel;
-
         private KeywordRecognizer keywordRecognizer;
 
-        #region Unity Methods
+        private SpeechKeywordRecognizedEventData speechKeywordRecognizedEventData;
 
         protected override void Start()
         {
             base.Start();
 
-            if (PersistentKeywords)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
+            speechKeywordRecognizedEventData = new SpeechKeywordRecognizedEventData(EventSystem.current);
 
             int keywordCount = Keywords.Length;
             if (keywordCount > 0)
             {
-                var keywords = new string[keywordCount];
-
+                string[] keywords = new string[keywordCount];
                 for (int index = 0; index < keywordCount; index++)
                 {
                     keywords[index] = Keywords[index].Keyword;
                 }
-
-                keywordRecognizer = new KeywordRecognizer(keywords, RecognitionConfidenceLevel);
+                keywordRecognizer = new KeywordRecognizer(keywords);
                 keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
 
                 if (RecognizerStart == RecognizerStartBehavior.AutoStart)
                 {
-                    keywordRecognizer.Start();
+                    StartKeywordRecognizer();
                 }
             }
             else
@@ -110,32 +91,38 @@ namespace HoloToolkit.Unity.InputModule
             }
         }
 
-        protected virtual void OnDisable()
+        protected override void OnDisableAfterStart()
         {
-            if (keywordRecognizer != null)
-            {
-                StopKeywordRecognizer();
-            }
+            StopKeywordRecognizer();
+
+            base.OnDisableAfterStart();
         }
 
-        protected virtual void OnEnable()
+        protected override void OnEnableAfterStart()
         {
-            if (keywordRecognizer != null && RecognizerStart == RecognizerStartBehavior.AutoStart)
+            base.OnEnableAfterStart();
+
+            if (RecognizerStart == RecognizerStartBehavior.AutoStart)
             {
                 StartKeywordRecognizer();
             }
         }
 
-        #endregion // Unity Methods
-
-        #region Event Callbacks
+        private void ProcessKeyBindings()
+        {
+            for (int index = Keywords.Length; --index >= 0;)
+            {
+                if (Input.GetKeyDown(Keywords[index].KeyCode))
+                {
+                    OnPhraseRecognized(ConfidenceLevel.High, TimeSpan.Zero, DateTime.Now, null, Keywords[index].Keyword);
+                }
+            }
+        }
 
         private void KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
             OnPhraseRecognized(args.confidence, args.phraseDuration, args.phraseStartTime, args.semanticMeanings, args.text);
         }
-
-        #endregion // Event Callbacks
 
         /// <summary>
         /// Make sure the keyword recognizer is off, then start it.
@@ -146,17 +133,6 @@ namespace HoloToolkit.Unity.InputModule
             if (keywordRecognizer != null && !keywordRecognizer.IsRunning)
             {
                 keywordRecognizer.Start();
-            }
-        }
-
-        private void ProcessKeyBindings()
-        {
-            for (int index = Keywords.Length; --index >= 0;)
-            {
-                if (Input.GetKeyDown(Keywords[index].KeyCode))
-                {
-                    OnPhraseRecognized(RecognitionConfidenceLevel, TimeSpan.Zero, DateTime.Now, null, Keywords[index].Keyword);
-                }
             }
         }
 
@@ -172,23 +148,58 @@ namespace HoloToolkit.Unity.InputModule
             }
         }
 
+        private static readonly ExecuteEvents.EventFunction<ISpeechHandler> OnSpeechKeywordRecognizedEventHandler =
+            delegate (ISpeechHandler handler, BaseEventData eventData)
+            {
+                SpeechKeywordRecognizedEventData casted = ExecuteEvents.ValidateEventData<SpeechKeywordRecognizedEventData>(eventData);
+                handler.OnSpeechKeywordRecognized(casted);
+            };
+
         protected void OnPhraseRecognized(ConfidenceLevel confidence, TimeSpan phraseDuration, DateTime phraseStartTime, SemanticMeaning[] semanticMeanings, string text)
         {
-            InputManager.Instance.RaiseSpeechKeywordPhraseRecognized(this, 0, confidence, phraseDuration, phraseStartTime, semanticMeanings, text);
+            uint sourceId = 0;
+            object tag = null;
+
+            // Create input event
+            speechKeywordRecognizedEventData.Initialize(this, sourceId, tag, confidence, phraseDuration, phraseStartTime, semanticMeanings, text);
+
+            // Pass handler through HandleEvent to perform modal/fallback logic
+            InputManager.Instance.HandleEvent(speechKeywordRecognizedEventData, OnSpeechKeywordRecognizedEventHandler);
         }
-#endif
 
-        #region Base Input Source Methods
+        public override bool TryGetSourceKind(uint sourceId, out InteractionSourceKind sourceKind)
+        {
+            sourceKind = InteractionSourceKind.Voice;
+            return true;
+        }
 
-        public override bool TryGetPosition(uint sourceId, out Vector3 position)
+        public override bool TryGetPointerPosition(uint sourceId, out Vector3 position)
         {
             position = Vector3.zero;
             return false;
         }
 
-        public override bool TryGetOrientation(uint sourceId, out Quaternion orientation)
+        public override bool TryGetPointerRotation(uint sourceId, out Quaternion rotation)
         {
-            orientation = Quaternion.identity;
+            rotation = Quaternion.identity;
+            return false;
+        }
+
+        public override bool TryGetPointingRay(uint sourceId, out Ray pointingRay)
+        {
+            pointingRay = default(Ray);
+            return false;
+        }
+
+        public override bool TryGetGripPosition(uint sourceId, out Vector3 position)
+        {
+            position = Vector3.zero;
+            return false;
+        }
+
+        public override bool TryGetGripRotation(uint sourceId, out Quaternion rotation)
+        {
+            rotation = Quaternion.identity;
             return false;
         }
 
@@ -197,6 +208,38 @@ namespace HoloToolkit.Unity.InputModule
             return SupportedInputInfo.None;
         }
 
-        #endregion // Base Input Source Methods
+        public override bool TryGetThumbstick(uint sourceId, out bool isPressed, out Vector2 position)
+        {
+            isPressed = false;
+            position = Vector2.zero;
+            return false;
+        }
+
+        public override bool TryGetTouchpad(uint sourceId, out bool isPressed, out bool isTouched, out Vector2 position)
+        {
+            isPressed = false;
+            isTouched = false;
+            position = Vector2.zero;
+            return false;
+        }
+
+        public override bool TryGetSelect(uint sourceId, out bool isPressed, out double pressedAmount)
+        {
+            isPressed = false;
+            pressedAmount = 0.0;
+            return false;
+        }
+
+        public override bool TryGetGrasp(uint sourceId, out bool isPressed)
+        {
+            isPressed = false;
+            return false;
+        }
+
+        public override bool TryGetMenu(uint sourceId, out bool isPressed)
+        {
+            isPressed = false;
+            return false;
+        }
     }
 }

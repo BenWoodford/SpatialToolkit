@@ -16,13 +16,24 @@ public class ToolkitExample : MonoBehaviour {
 	
     public void OnScanComplete()
     {
-        STTopologyQuery query = new STTopologyQuery(STTopologyQueryType.PositionsOnFloor) { Floor_MinLength = 0.25f, MinWidth = 0.25f };
+        STTopologyQuery query = new STTopologyQuery(STTopologyQueryType.PositionsOnFloor) { Floor_MinLength = 0.5f, MinWidth = 0.5f };
         Debug.Log("Query Result: " + query.RunQuery() + " positions");
 
         foreach(SpatialUnderstandingDllTopology.TopologyResult result in query.Results)
         {
             GameObject newObj = Instantiate(TestPrefab, result.position, Quaternion.LookRotation(result.normal, Vector3.up));
-            newObj.transform.localScale = new Vector3(result.width * 0.8f, (result.length + result.width) / 2f, result.length * 0.8f);
+            newObj.GetComponent<MeshRenderer>().material.color = Color.red;
+            newObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        }
+
+        STShapeQuery shapeQuery = new STShapeQuery(STShapeQueryType.ShapeBounds, "Square");
+        Debug.Log("Shape Query Result: " + shapeQuery.RunQuery() + " positions");
+
+        foreach(SpatialUnderstandingDllShapes.ShapeResult result in shapeQuery.Results)
+        {
+            GameObject newObj = Instantiate(TestPrefab, result.position, Quaternion.identity);
+            newObj.GetComponent<MeshRenderer>().material.color = Color.yellow;
+            newObj.transform.localScale = new Vector3(result.halfDims.x, result.halfDims.y, (result.halfDims.x + result.halfDims.y) / 2);
         }
     }
 }

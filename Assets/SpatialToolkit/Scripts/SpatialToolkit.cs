@@ -29,6 +29,9 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
 
 	// Use this for initialization
 	void Start () {
+        Shapes[0].Components[0].Constraints.Add(new STShapeConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceArea_Min, FloatValue1 = 0.035f });
+        Shapes[0].Components[0].Constraints.Add(new STShapeConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceCount_Min, IntValue1 = 1 });
+
         InputManager.Instance.PushFallbackInputHandler(gameObject);
         RegisterShapes();
         ProcessScanState();

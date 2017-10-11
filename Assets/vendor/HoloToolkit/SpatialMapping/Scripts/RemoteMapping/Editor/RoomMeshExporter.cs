@@ -9,7 +9,7 @@ namespace HoloToolkit.Unity
 {
     public static class RoomMeshExporter
     {
-        private const string ExportDirectoryKey = "_ExportDirectory";
+        private const string ExportDirectoryKey = "ExportDirectory";
         private const string ExportDirectoryDefault = "MeshExport";
         private const string ExportDialogErrorTitle = "Export Error";
         private const string WavefrontFileExtension = ".obj";
@@ -18,7 +18,7 @@ namespace HoloToolkit.Unity
         {
             get
             {
-                return EditorPrefsUtility.GetEditorPref(ExportDirectoryKey, ExportDirectoryDefault);
+                return EditorPrefs.GetString(ExportDirectoryKey, ExportDirectoryDefault);
             }
             set
             {
@@ -27,7 +27,7 @@ namespace HoloToolkit.Unity
                     value = ExportDirectoryDefault;
                 }
 
-                EditorPrefsUtility.SetEditorPref(ExportDirectoryKey, value);
+                EditorPrefs.SetString(ExportDirectoryKey, value);
             }
         }
 

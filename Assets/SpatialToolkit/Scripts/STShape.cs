@@ -25,11 +25,14 @@ public class STShape
             compList.Add(new SpatialUnderstandingDllShapes.ShapeComponent(c.GetConstraints()));
         }
 
-        IntPtr componentsPtr = SpatialUnderstanding.Instance.UnderstandingDLL.PinObject(compList);
+        IntPtr componentsPtr = SpatialUnderstanding.Instance.UnderstandingDLL.PinObject(compList.ToArray());
 
         if(SpatialUnderstandingDllShapes.AddShape(ShapeName, compList.Count, componentsPtr, 0, IntPtr.Zero) == 0)
         {
             Debug.LogError("Failed to create custom shape");
+        } else
+        {
+            Debug.Log("Added Shape " + ShapeName + " with " + Components.Count + " components");
         }
     }
 }

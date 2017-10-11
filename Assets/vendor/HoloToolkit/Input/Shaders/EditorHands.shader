@@ -89,5 +89,5 @@
         ENDCG
         }
     }
-    CustomEditor "HoloToolkit.Unity.EditorHandsMaterialInspector"
+    CustomEditor "EditorHandsMaterialInspector"
 }

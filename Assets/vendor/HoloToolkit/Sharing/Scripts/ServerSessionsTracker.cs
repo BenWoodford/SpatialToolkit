@@ -5,9 +5,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using HoloToolkit.Unity;
-using UnityEngine;
 
 namespace HoloToolkit.Sharing
 {
@@ -168,14 +166,8 @@ namespace HoloToolkit.Sharing
 
         private void OnSessionClosed(Session session)
         {
-            for (int i = 0; i < Sessions.Count; i++)
-            {
-                if (Sessions[i].GetName().ToString().Equals(session.GetName().ToString()))
-                {
-                    SessionClosed.RaiseEvent(Sessions[i]);
-                    Sessions.Remove(Sessions[i]);
-                }
-            }
+            SessionClosed.RaiseEvent(session);
+            Sessions.Remove(session);
         }
 
         private void OnServerDisconnected()
