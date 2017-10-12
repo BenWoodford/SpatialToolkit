@@ -39,7 +39,6 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
         Shapes[0].Components[0].Constraints.Add(new STShapeComponentConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceCount_Min, IntValue1 = 1 });
 
         InputManager.Instance.PushFallbackInputHandler(gameObject);
-        RegisterShapes();
         ProcessScanState();
     }
 
@@ -75,6 +74,7 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
             case SpatialUnderstanding.ScanStates.Done:
                 stats = GetScanStats();
                 UpdateText("Scan Complete!", System.String.Format("Total Surface Area: {0:0.##}, Horizontal: {1:0.##}, Wall: {2:0.##}", stats.TotalSurfaceArea, stats.HorizSurfaceArea, stats.WallSurfaceArea));
+                RegisterShapes();
 
                 if (OnScanComplete != null)
                     OnScanComplete.Invoke();

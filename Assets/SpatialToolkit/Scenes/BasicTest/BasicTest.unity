@@ -442,8 +442,8 @@ MonoBehaviour:
     foldedOut: 1
   InfoText: {fileID: 358589867}
   InfoSubText: {fileID: 1014016045}
-  minimumHorizontalScanArea: 4
-  minimumWallScanArea: 10
+  minimumHorizontalScanArea: 0
+  minimumWallScanArea: 0
   Instance: {fileID: 0}
   OnScanComplete:
     m_PersistentCalls:

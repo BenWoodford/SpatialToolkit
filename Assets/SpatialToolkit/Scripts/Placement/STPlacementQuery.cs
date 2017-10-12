@@ -132,7 +132,7 @@ public class STPlacementQuery
                 return null;
         }
 
-        if(SpatialUnderstandingDllObjectPlacement.Solver_PlaceObject(QueryName, definitionPtr, Rules.Count, rulePtr, Constraints.Count, constraintPtr, SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticObjectPlacementResultPtr()) > 0)
+        if(SpatialUnderstandingDllObjectPlacement.Solver_PlaceObject(QueryName + "_" + placementObject.name, definitionPtr, Rules.Count, rulePtr, Constraints.Count, constraintPtr, SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticObjectPlacementResultPtr()) > 0)
         {
             _hasRun = true;
             Debug.Log("Placing object for query " + QueryName);
@@ -140,6 +140,10 @@ public class STPlacementQuery
             Result = SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticObjectPlacementResult();
 
             GameObject resultantObject = GameObject.Instantiate(placementObject, Result.Position, Quaternion.LookRotation(Result.Forward, Result.Up));
+            if (resultantObject.GetComponent<STPlacedObject>() == null) {
+                STPlacedObject placedObject = resultantObject.AddComponent<STPlacedObject>();
+                placedObject.PlacedObjectName = QueryName + "_" + placementObject.name;
+            }
             // TODO: Add a component to the object to remove it from Spatial Understanding if removed in Unity.
             return new STPlacementResult(resultantObject, Result);
         } else

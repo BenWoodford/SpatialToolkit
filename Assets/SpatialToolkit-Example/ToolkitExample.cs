@@ -36,7 +36,8 @@ public class ToolkitExample : MonoBehaviour, IInputClickHandler
 
     void ResetObjects()
     {
-        foreach(GameObject g in GameObject.FindGameObjectsWithTag("TestCube"))
+        SpatialUnderstandingDllObjectPlacement.Solver_RemoveAllObjects();
+        foreach (GameObject g in GameObject.FindGameObjectsWithTag("TestCube"))
         {
             Destroy(g);
         }
@@ -66,15 +67,15 @@ public class ToolkitExample : MonoBehaviour, IInputClickHandler
 
         STPlacementQuery placementQuery = new STPlacementQuery("ExampleQuery", STPlacementType.Shape) { TargetShape = SpatialToolkit.GetShape("Square"), TargetShapeComponent = SpatialToolkit.GetShape("Square").GetComponent("Main") };
         TestPrefab.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        placementQuery.Rules.Add(new STPlacementRule()
-        {
-            Type = SpatialUnderstandingDllObjectPlacement.ObjectPlacementRule.ObjectPlacementRuleType.Rule_AwayFromOtherObjects,
-            MinDistance = 0.5f,
-        });
-        placementQuery.Place(TestPrefab, new Vector3(0.25f, 0.25f, 0.25f));
+        
+        placementQuery.Place(TestPrefab, new Vector3(0.1f, 0.1f, 0.1f));
 
         STPlacementQuery floorQuery = new STPlacementQuery("FloorQuery", STPlacementType.FloorAndCeiling);
-        floorQuery.Rules.Add(placementQuery.Rules[0]);
+        floorQuery.Rules.Add(new STPlacementRule()
+        {
+            Type = SpatialUnderstandingDllObjectPlacement.ObjectPlacementRule.ObjectPlacementRuleType.Rule_AwayFromOtherObjects,
+            MinDistance = 0.2f,
+        });
 
         for (int i = 0; i < 10; i++)
         {
