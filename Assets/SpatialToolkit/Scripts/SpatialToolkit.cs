@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
 
 public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
 
@@ -15,6 +16,8 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
     public TextMesh InfoSubText;
     public float minimumHorizontalScanArea = 25f;
     public float minimumWallScanArea = 10f;
+
+    public SpatialToolkit Instance;
 
     public UnityEvent OnScanComplete;
 
@@ -29,12 +32,18 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
 
 	// Use this for initialization
 	void Start () {
-        Shapes[0].Components[0].Constraints.Add(new STShapeConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceArea_Min, FloatValue1 = 0.035f });
-        Shapes[0].Components[0].Constraints.Add(new STShapeConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceCount_Min, IntValue1 = 1 });
+        Instance = this;
+        Shapes[0].Components[0].Constraints.Add(new STShapeComponentConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceArea_Min, FloatValue1 = 0.035f });
+        Shapes[0].Components[0].Constraints.Add(new STShapeComponentConstraint() { Type = SpatialUnderstandingDllShapes.ShapeComponentConstraintType.SurfaceCount_Min, IntValue1 = 1 });
 
         InputManager.Instance.PushFallbackInputHandler(gameObject);
         RegisterShapes();
         ProcessScanState();
+    }
+
+    public STShape GetShape(string shapeName)
+    {
+        return Shapes.Single(s => s.ShapeName == shapeName);
     }
 
     private void Instance_ScanStateChanged()
@@ -110,6 +119,8 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
         {
             s.Register();
         }
+
+        SpatialUnderstandingDllShapes.ActivateShapeAnalysis();
     }
 
     public void AddShape(STShape shape)

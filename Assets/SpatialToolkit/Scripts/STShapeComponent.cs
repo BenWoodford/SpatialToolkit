@@ -6,17 +6,29 @@ using UnityEngine;
 public class STShapeComponent
 {
     public string ComponentName;
-    public List<STShapeConstraint> Constraints;
+    public List<STShapeComponentConstraint> Constraints;
+
+    STShape _parent;
+
+    public STShapeComponent(STShape parent)
+    {
+        _parent = parent;
+    }
 
     public List<HoloToolkit.Unity.SpatialUnderstandingDllShapes.ShapeComponentConstraint> GetConstraints()
     {
         List<HoloToolkit.Unity.SpatialUnderstandingDllShapes.ShapeComponentConstraint> ret = new List<HoloToolkit.Unity.SpatialUnderstandingDllShapes.ShapeComponentConstraint>();
 
-        foreach (STShapeConstraint c in Constraints)
+        foreach (STShapeComponentConstraint c in Constraints)
         {
             ret.Add(c.ToNativeConstraint());
         }
 
         return ret;
+    }
+
+    public int GetComponentIndex(STShapeComponent component)
+    {
+        return _parent.GetComponentIndex(component);
     }
 }

@@ -443,11 +443,13 @@ MonoBehaviour:
         IntValue1: 0
         IntValue2: 0
         foldedOut: 0
+    Constraints: []
     foldedOut: 1
   InfoText: {fileID: 358589867}
   InfoSubText: {fileID: 1014016045}
   minimumHorizontalScanArea: 4
   minimumWallScanArea: 10
+  Instance: {fileID: 0}
   OnScanComplete:
     m_PersistentCalls:
       m_Calls:
@@ -804,7 +806,7 @@ Prefab:
     - target: {fileID: 114000013027790266, guid: d41fa7615c3c85b40bcc95fc4367b607,
         type: 2}
       propertyPath: MaxFrameTime
-      value: 50
+      value: 25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d41fa7615c3c85b40bcc95fc4367b607, type: 2}

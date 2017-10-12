@@ -62,7 +62,7 @@ public class SpatialToolkitEditor : Editor {
                 {
                     if (shape.Components == null)
                         shape.Components = new List<STShapeComponent>();
-                    shape.Components.Add(new STShapeComponent() { ComponentName = "New Component" });
+                    shape.Components.Add(new STShapeComponent(shape) { ComponentName = "New Component" });
                 }
 
                 EditorGUILayout.EndHorizontal();
@@ -86,8 +86,8 @@ public class SpatialToolkitEditor : Editor {
                         if (GUILayout.Button("+", GUILayout.ExpandWidth(false)))
                         {
                             if (component.Constraints == null)
-                                component.Constraints = new List<STShapeConstraint>();
-                            component.Constraints.Add(new STShapeConstraint() { Type = HoloToolkit.Unity.SpatialUnderstandingDllShapes.ShapeComponentConstraintType.IsRectangle });
+                                component.Constraints = new List<STShapeComponentConstraint>();
+                            component.Constraints.Add(new STShapeComponentConstraint() { Type = HoloToolkit.Unity.SpatialUnderstandingDllShapes.ShapeComponentConstraintType.IsRectangle });
                         }
 
                         EditorGUILayout.EndHorizontal();
@@ -100,7 +100,7 @@ public class SpatialToolkitEditor : Editor {
                                 if (component.Constraints.Count - 1 < p)
                                     break;
 
-                                STShapeConstraint constraint = component.Constraints[p];
+                                STShapeComponentConstraint constraint = component.Constraints[p];
 
                                 EditorGUILayout.BeginVertical(new GUIStyle() { margin = new RectOffset(10, 10, 10, 10) });
 
@@ -128,7 +128,7 @@ public class SpatialToolkitEditor : Editor {
         }
     }
 
-    void HandleConstraintGUI(STShapeConstraint constraint)
+    void HandleConstraintGUI(STShapeComponentConstraint constraint)
     {
         EditorGUILayout.BeginVertical(new GUIStyle() { margin = new RectOffset(10, 10, 10, 10) });
         constraint.foldedOut = EditorGUILayout.Foldout(constraint.foldedOut, "Settings");

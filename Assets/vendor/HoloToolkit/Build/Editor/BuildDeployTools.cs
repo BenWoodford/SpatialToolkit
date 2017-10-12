@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.Xml.Linq;
+using Microsoft.Win32;
 
 namespace HoloToolkit.Unity
 {
@@ -64,18 +65,66 @@ namespace HoloToolkit.Unity
 
         public static string CalcMSBuildPath(string msBuildVersion)
         {
-            // TODO: robertes: If this is going to support msbuild 15 and beyond, it needs to be updated to use the COM or powershell interfaces to find msbuild.
-            //                 See: https://github.com/Microsoft/vssetup.powershell/wiki
-            using (Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(string.Format(@"Software\Microsoft\MSBuild\ToolsVersions\{0}", msBuildVersion)))
+            if (msBuildVersion.Equals("14.0"))
             {
-                if (key == null)
+                using (RegistryKey key =
+                    Registry.LocalMachine.OpenSubKey(
+                        string.Format(@"Software\Microsoft\MSBuild\ToolsVersions\{0}", msBuildVersion)))
                 {
-                    return null;
+                    if (key != null)
+                    {
+                        var msBuildBinFolder = (string)key.GetValue("MSBuildToolsPath");
+                        return Path.Combine(msBuildBinFolder, "msbuild.exe");
+                    }
                 }
-                string msBuildBinFolder = key.GetValue("MSBuildToolsPath") as string;
-                string msBuildPath = Path.Combine(msBuildBinFolder, "msbuild.exe");
-                return msBuildPath;
             }
+
+            // For MSBuild 15+ we should to use vswhere to give us the correct instance
+            string output = @"/C vswhere -version " + msBuildVersion + " -products * -requires Microsoft.Component.MSBuild -property installationPath";
+
+            // get the right program files path based on whether the pc is x86 or x64
+            string programFiles = @"C:\Program Files\";
+            if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE", EnvironmentVariableTarget.Machine) == "AMD64")
+            {
+                programFiles = @"C:\Program Files (x86)\";
+            }
+
+            var vswherePInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = false,
+                Arguments = output,
+                WorkingDirectory = programFiles + @"Microsoft Visual Studio\Installer"
+            };
+
+            using (var vswhereP = new System.Diagnostics.Process())
+            {
+                vswhereP.StartInfo = vswherePInfo;
+                vswhereP.Start();
+                output = vswhereP.StandardOutput.ReadToEnd();
+                vswhereP.WaitForExit();
+            }
+
+            string[] paths = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (paths.Length > 0)
+            {
+                // if there are multiple 2017 installs,
+                // prefer enterprise, then pro, then community
+                string bestPath = paths.OrderBy(p => p.ToLower().Contains("enterprise"))
+                                        .ThenBy(p => p.ToLower().Contains("professional"))
+                                        .ThenBy(p => p.ToLower().Contains("community")).First();
+                if (File.Exists(bestPath + @"\MSBuild\" + msBuildVersion + @"\Bin\MSBuild.exe"))
+                {
+                    return bestPath + @"\MSBuild\" + msBuildVersion + @"\Bin\MSBuild.exe";
+                }
+            }
+
+            Debug.LogError("Unable to find a valid path to Visual Studio Instance!");
+            return string.Empty;
         }
 
         public static bool BuildAppxFromSolution(string productName, string msBuildVersion, bool forceRebuildAppx, string buildConfig, string buildDirectory, bool incrementVersion)
