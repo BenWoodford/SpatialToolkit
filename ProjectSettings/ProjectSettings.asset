@@ -550,7 +550,7 @@ PlayerSettings:
   platformCapabilities:
     WindowsStoreApps:
       InternetClient: False
-      InternetClientServer: False
+      InternetClientServer: True
       Microphone: False
       PrivateNetworkClientServer: False
       SpatialPerception: True

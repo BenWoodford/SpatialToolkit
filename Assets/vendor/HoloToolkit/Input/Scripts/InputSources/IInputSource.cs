@@ -1,29 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
 using UnityEngine;
-using UnityEngine.XR.WSA.Input;
 
 namespace HoloToolkit.Unity.InputModule
 {
-    /// <summary>
-    /// Flags used to indicate which input information is supported by an input source.
-    /// </summary>
-    [Flags]
-    public enum SupportedInputInfo
-    {
-        None = 0,
-        Position = (1 << 0),
-        Rotation = (1 << 1),
-        Pointing = (1 << 2),
-        Thumbstick = (1 << 3),
-        Touchpad = (1 << 4),
-        Select = (1 << 5),
-        Menu = (1 << 6),
-        Grasp = (1 << 7),
-    }
-
     /// <summary>
     /// Interface for an input source.
     /// An input source can be anything that a user can use to interact with a device.
@@ -42,7 +23,7 @@ namespace HoloToolkit.Unity.InputModule
         /// <param name="inputInfo">Input info type that we want to get information about.</param>
         bool SupportsInputInfo(uint sourceId, SupportedInputInfo inputInfo);
 
-        bool TryGetSourceKind(uint sourceId, out InteractionSourceKind sourceKind);
+        bool TryGetSourceKind(uint sourceId, out InteractionSourceInfo sourceKind);
 
         /// <summary>
         /// Returns the position of the input source, if available.

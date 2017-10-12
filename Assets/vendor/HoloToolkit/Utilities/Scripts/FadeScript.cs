@@ -1,11 +1,16 @@
 ﻿using System;
 using UnityEngine;
+
+#if UNITY_WSA
 using UnityEngine.XR.WSA;
+#endif
 
 namespace HoloToolkit.Unity
 {
     public class FadeScript : SingleInstance<FadeScript>
     {
+        [Tooltip("If true, the FadeScript will update the shared material. Useful for fading multiple cameras that each render different layers.")]
+        public bool FadeSharedMaterial = false;
         Material fadeMaterial;
         Color fadeColor = Color.black;
 
@@ -33,15 +38,24 @@ namespace HoloToolkit.Unity
 
         void Start()
         {
+#if UNITY_WSA
             if (!HolographicSettings.IsDisplayOpaque)
             {
                 GetComponentInChildren<MeshRenderer>().enabled = false;
                 Debug.Log("Removing unnecessary full screen effect from HoloLens");
                 return;
             }
+#endif
 
             currentState = FadeState.idle;
-            fadeMaterial = GetComponentInChildren<MeshRenderer>().material;
+            if (FadeSharedMaterial)
+            {
+                fadeMaterial = GetComponentInChildren<MeshRenderer>().sharedMaterial;
+            }
+            else
+            {
+                fadeMaterial = GetComponentInChildren<MeshRenderer>().material;
+            }
         }
 
         void Update()
@@ -85,7 +99,7 @@ namespace HoloToolkit.Unity
 
         protected override void OnDestroy()
         {
-            if (fadeMaterial != null)
+            if (fadeMaterial != null && !FadeSharedMaterial)
             {
                 Destroy(fadeMaterial);
             }

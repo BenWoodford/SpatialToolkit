@@ -4,4 +4,7 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/SpatialToolkit/Scenes/BasicTest/BasicTest.unity
+    guid: dc3a7e3b053ca034aa31233fed3b9cbb

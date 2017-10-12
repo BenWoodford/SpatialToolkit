@@ -21,6 +21,8 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
 
     public UnityEvent OnScanComplete;
 
+    float lastUpdateTime = 0.0f;
+
     bool ScanMinimumMet
     {
         get
@@ -143,9 +145,10 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
 	
 	// Update is called once per frame
 	void Update () {
-		if(SpatialUnderstanding.Instance.ScanState == SpatialUnderstanding.ScanStates.Scanning)
+		if(lastUpdateTime < (Time.realtimeSinceStartup - 2) && SpatialUnderstanding.Instance.ScanState == SpatialUnderstanding.ScanStates.Scanning)
         {
             UpdateMidScanState();
+            lastUpdateTime = Time.realtimeSinceStartup;
         }
 	}
 
