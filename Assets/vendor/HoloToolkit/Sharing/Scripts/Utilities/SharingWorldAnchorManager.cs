@@ -7,9 +7,9 @@ using HoloToolkit.Unity;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.WSA;
-using UnityEngine.XR.WSA.Persistence;
-using UnityEngine.XR.WSA.Sharing;
+using UnityEngine.VR.WSA;
+using UnityEngine.VR.WSA.Persistence;
+using UnityEngine.VR.WSA.Sharing;
 #endif
 
 

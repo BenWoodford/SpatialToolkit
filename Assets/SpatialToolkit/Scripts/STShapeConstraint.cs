@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using HoloToolkit.Unity;
+using System;
 
 [System.Serializable]
 public class STShapeConstraint
@@ -16,6 +17,7 @@ public class STShapeConstraint
     public bool foldedOut = false;
 #endif
 
+    [NonSerialized]
     STShapeComponent _parent;
 
     public STShapeConstraint(STShapeComponent parent)

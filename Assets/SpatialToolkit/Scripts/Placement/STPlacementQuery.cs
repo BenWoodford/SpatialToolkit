@@ -73,8 +73,6 @@ public class STPlacementQuery
 
         Result = new SpatialUnderstandingDllObjectPlacement.ObjectPlacementResult();
 
-        IntPtr resultPtr = SpatialUnderstanding.Instance.UnderstandingDLL.PinObject(Result);
-
         List<SpatialUnderstandingDllObjectPlacement.ObjectPlacementRule> nativeRules = new List<SpatialUnderstandingDllObjectPlacement.ObjectPlacementRule>();
         List<SpatialUnderstandingDllObjectPlacement.ObjectPlacementConstraint> nativeConstraints = new List<SpatialUnderstandingDllObjectPlacement.ObjectPlacementConstraint>();
 

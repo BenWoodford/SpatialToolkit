@@ -9,7 +9,8 @@ namespace HoloToolkit.Unity
 {
     /// <summary>
     /// Configuration options derived from here: 
-    /// https://developer.microsoft.com/en-us/windows/mixed-reality/unity_development_overview#Configuring_a_Unity_project_for_HoloLens
+    /// TODO: Update URL below
+    /// https://developer.microsoft.com/en-us/windows/holographic/unity_development_overview#Configuring_a_Unity_project_for_HoloLens
     /// </summary>
     public class AutoConfigureMenu
 #if UNITY_2017_1_OR_NEWER

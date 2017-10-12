@@ -34,20 +34,9 @@ namespace HoloToolkit.Unity.InputModule
 
         private void Awake()
         {
-            if (Application.isEditor)
-            {
-                if (UnityEngine.XR.XRDevice.isPresent)
-                {
-                    Destroy(this);
-                    return;
-                }
-            }
-            else
-            {
-                Destroy(this);
-                return;
-            }
-
+#if !UNITY_EDITOR
+            Destroy(this);
+#endif
             cameraTransform = GetComponent<Camera>().transform;
             if (cameraTransform == null)
             {
@@ -66,6 +55,7 @@ namespace HoloToolkit.Unity.InputModule
             JoystickXYRotationAxisControl.enabled = JoystickSupported;
             JoystickXYTranslationAxisControl.enabled = JoystickSupported;
             JoystickXZTranslationAxisControl.enabled = JoystickSupported;
+
         }
 
         private void Update()

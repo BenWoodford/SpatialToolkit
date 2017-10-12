@@ -9,7 +9,7 @@ namespace HoloToolkit.Unity.InputModule
     /// <summary>
     /// Describes an input event that involves content manipulation.
     /// </summary>
-    public class ManipulationEventData : BaseInputEventData
+    public class ManipulationEventData : InputEventData
     {
         /// <summary>
         /// The amount of manipulation that has occurred. Usually in the form of
@@ -21,9 +21,9 @@ namespace HoloToolkit.Unity.InputModule
         {
         }
 
-        public void Initialize(IInputSource inputSource, uint sourceId, object tag, Vector3 cumulativeDelta)
+        public void Initialize(IInputSource inputSource, uint sourceId, Vector3 cumulativeDelta)
         {
-            BaseInitialize(inputSource, sourceId, tag);
+            BaseInitialize(inputSource, sourceId);
             CumulativeDelta = cumulativeDelta;
         }
     }

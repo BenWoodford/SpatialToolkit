@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using UnityEditor;
 
 namespace HoloToolkit.Unity
 {
@@ -285,7 +284,6 @@ namespace HoloToolkit.Unity
                     if (status == AppInstallStatus.InstallSuccess)
                     {
                         Debug.Log("Install Successful!");
-                        EditorUtility.DisplayDialog("Build AppX", "AppX Build Successful!", "OK");
                         break;
                     }
                     if (status == AppInstallStatus.InstallFail)

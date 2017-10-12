@@ -14,9 +14,9 @@ namespace HoloToolkit.Unity.InputModule
         {
         }
 
-        public void Initialize(IInputSource inputSource, uint sourceId, object tag)
+        public void Initialize(IInputSource inputSource, uint sourceId)
         {
-            BaseInitialize(inputSource, sourceId, tag);
+            BaseInitialize(inputSource, sourceId);
         }
     }
 }

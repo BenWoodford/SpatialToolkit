@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿//
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
+//
 
 using System;
 using System.Diagnostics;
@@ -236,7 +238,7 @@ namespace HoloToolkit.Unity
 
             // Before building, need to run a nuget restore to generate a json.lock file. Failing to do
             // this breaks the build in VS RTM
-            /*if (!RestoreNugetPackages(nugetPath, storePath) ||
+            if (!RestoreNugetPackages(nugetPath, storePath) ||
                 !RestoreNugetPackages(nugetPath, storePath + "\\" + productName) ||
                 EditorUserBuildSettings.wsaGenerateReferenceProjects && !RestoreNugetPackages(nugetPath, storePath + "/GeneratedProjects/UWP/Assembly-CSharp") ||
                 EditorUserBuildSettings.wsaGenerateReferenceProjects && !RestoreNugetPackages(nugetPath, storePath + "/GeneratedProjects/UWP/Assembly-CSharp-firstpass"))
@@ -244,7 +246,7 @@ namespace HoloToolkit.Unity
                 Debug.LogError("Failed to restore nuget packages");
                 EditorUtility.ClearProgressBar();
                 return false;
-            }*/
+            }
 
             EditorUtility.DisplayProgressBar("Build AppX", "Building AppX Package...", 25);
 

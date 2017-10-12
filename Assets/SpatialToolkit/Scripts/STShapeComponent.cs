@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class STShapeComponent
     public string ComponentName;
     public List<STShapeComponentConstraint> Constraints;
 
+    [NonSerialized]
     STShape _parent;
 
     public STShapeComponent(STShape parent)
