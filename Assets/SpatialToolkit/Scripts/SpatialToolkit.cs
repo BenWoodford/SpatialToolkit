@@ -23,6 +23,8 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
 
     float lastUpdateTime = 0.0f;
 
+    public bool disableMeshWhenComplete = false;
+
     bool ScanMinimumMet
     {
         get
@@ -74,12 +76,23 @@ public class SpatialToolkit : MonoBehaviour, IInputClickHandler {
             case SpatialUnderstanding.ScanStates.Done:
                 stats = GetScanStats();
                 UpdateText("Scan Complete!", System.String.Format("Total Surface Area: {0:0.##}, Horizontal: {1:0.##}, Wall: {2:0.##}", stats.TotalSurfaceArea, stats.HorizSurfaceArea, stats.WallSurfaceArea));
-                RegisterShapes();
-
-                if (OnScanComplete != null)
-                    OnScanComplete.Invoke();
+                ScanComplete();
                 break;
         }
+    }
+
+    void ScanComplete()
+    {
+        RegisterShapes();
+
+        if(disableMeshWhenComplete)
+        {
+            SpatialUnderstanding.Instance.UnderstandingCustomMesh.DrawProcessedMesh = false;
+            GameObject.FindObjectOfType<HoloToolkit.Unity.SpatialMapping.SpatialMappingManager>().DrawVisualMeshes = false;
+        }
+
+        if (OnScanComplete != null)
+            OnScanComplete.Invoke();
     }
 
     void UpdateMidScanState()
